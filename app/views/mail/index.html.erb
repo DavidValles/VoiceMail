@@ -1,2 +1,113 @@
-<h1>Mail#index</h1>
-<p>Find me in app/views/mail/index.html.erb</p>
+<h1>My messages</h1>
+<table>
+  <tr>
+    <th>From</th>
+    <th>Subject</th>
+    <th>Received</th>
+  </tr>
+  <% @messages.each do |message| %>
+    <tr>
+      <td id="msgNam"><%= message['From']['EmailAddress']['Name'] %></td>
+      <td id="msgSub"><%= message['Subject'] %></td>
+      <td id="msgID" hidden><%= message['Id'] %></td>
+      <td id="msgRec"><%= message['ReceivedDateTime'] %></td>
+    </tr>
+  <% end %>
+</table>
+<div hidden id="body"> <%= @body.html_safe %></div>
+ <textarea type="text" name="q" id="transcript" placeholder="Speak" /></textarea>
+<script type="text/javascript">
+
+
+$( document ).ready(function() {
+
+
+var num_N = $("[id=msgNam]")
+var num_S = $("[id=msgSub]")
+var num_B = $("[id=msgID]")   
+var num = num_N.length
+
+
+
+var select = "Select the message you want to hear"
+
+var msg = new SpeechSynthesisUtterance(select);
+window.speechSynthesis.speak(msg);
+
+  for(i=0;i<num;i++){
+
+    select = "Number " + (i+1) + "from " + num_N[i].innerHTML
+    var msg = new SpeechSynthesisUtterance(select);
+    window.speechSynthesis.speak(msg);
+
+  }
+
+var result;
+function startDictation() {
+ 
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+ 
+      var recognition = new webkitSpeechRecognition();
+ 
+      recognition.continuous = false;
+      recognition.interimResults = false;
+ 
+      recognition.lang = "en-US";
+      recognition.start();
+ 
+      recognition.onresult = function(e) {
+        document.getElementById('transcript').value
+                                 = e.results[0][0].transcript;
+        result = $('#transcript').value;
+        recognition.stop();
+        document.getElementById('labnol').submit();
+      };
+ 
+      recognition.onerror = function(e) {
+        recognition.stop();
+      }
+ 
+    }
+  }
+
+
+ startDictation()
+
+
+ //////////////////////////////////////
+
+
+
+
+
+$( "#body meta" ).remove( "meta" );
+$( "#body div" ).remove( "div" );
+$( "#body a" ).remove( "a" );
+$( "#body br" ).remove( "br" );
+$( "#body img" ).remove( "img" );
+
+
+var message_id = $("#body").html()
+var res = message_id.replace('"','')
+
+
+var sender = $("#msgNam")[parseInt(result)].innerHTML
+var subject = $("#msgSub")[parseInt(result)].innerHTML
+
+ var msg = new SpeechSynthesisUtterance(res);
+ var subj = new SpeechSynthesisUtterance("The subject is " + subject);
+ console.log(sender)
+ var sen = new SpeechSynthesisUtterance("Email from " + sender);
+
+    window.speechSynthesis.speak(sen);
+    window.speechSynthesis.speak(subj);                // to talk....
+//    window.speechSynthesis.speak(msg);
+
+
+
+});
+
+  
+
+
+</script>
